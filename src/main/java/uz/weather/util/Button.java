@@ -1,13 +1,13 @@
 package uz.weather.util;
 
 public interface Button {
-    String sendLocation = "Joylashuvni yuborish \uD83D\uDCCD";
+    /// Languages
+    String UZ = "O'zbek \uD83C\uDDFA\uD83C\uDDFF";
+    String EN = "English \uD83C\uDDFA\uD83C\uDDF8";
+    String RU = "Русский \uD83C\uDDF7\uD83C\uDDFA";
+
 
     /// Main panel buttons
-
-    String weather_now_uz = "☀️ Hozirgi ob-havo";
-    String weather_now_en = "☀️ Current Weather";
-    String weather_now_ru = "☀️ Текущая погода";
 
     String location_uz = "📍 Lokatsiyam";
     String location_en = "📍 My Location";

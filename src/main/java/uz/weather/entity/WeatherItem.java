@@ -1,18 +1,20 @@
-package uz.weather.entity;
+	package uz.weather.entity;
 
-import com.google.gson.annotations.SerializedName;
+	import com.google.gson.annotations.SerializedName;
+	import lombok.Getter;
 
-public class WeatherItem{
+	@Getter
+	public class WeatherItem{
 
-	@SerializedName("icon")
-	private String icon;
+		@SerializedName("icon")
+		private String icon;
 
-	@SerializedName("description")
-	private String description;
+		@SerializedName("description")
+		private String description;
 
-	@SerializedName("main")
-	private String main;
+		@SerializedName("main")
+		private String main;
 
-	@SerializedName("id")
-	private int id;
-}
+		@SerializedName("id")
+		private int id;
+	}

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 @Getter
-public class Clouds{
-	@SerializedName("all")
-	private int all;
+public class Rain {
+    @SerializedName("3h")
+    private double threeHour;
 }

@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import uz.weather.entity.User;
+import uz.weather.entity.enums.Language;
 import uz.weather.entity.enums.State;
 import uz.weather.util.Button;
 
@@ -34,14 +35,14 @@ public class Datasource {
         return reply;
     }
 
-    public static ReplyKeyboardMarkup keyboardLocation() {
+    public static ReplyKeyboardMarkup keyboardLocation(Language lang) {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
 
         KeyboardRow row = new KeyboardRow();
 
         KeyboardButton locationButton = new KeyboardButton();
-        locationButton.setText("📍 Lokatsiya yuborish");
+        locationButton.setText(lang == Language.UZBEK ? Button.location_uz : lang == Language.ENGLISH ? Button.location_en : Button.location_ru);
         locationButton.setRequestLocation(true);
 
         row.add(locationButton);

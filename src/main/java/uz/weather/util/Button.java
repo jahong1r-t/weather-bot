@@ -21,27 +21,27 @@ public interface Button {
     String week_en = "🗓 Week";
     String week_ru = "🗓 Неделя";
 
-    String night_uz = "🌙 Kecha";
-    String night_en = "🌙 Tonight";
-    String night_ru = "🌙 Ночь";
-
     String settings_uz = "⚙️ Sozlamalar";
     String settings_en = "⚙️ Settings";
     String settings_ru = "⚙️ Настройки";
 
-    String help_uz = "ℹ️ Yordam";
-    String help_en = "ℹ️ Help";
-    String help_ru = "ℹ️ Помощь";
-
-    String subscribe_uz = "🔔 Obuna";
-    String subscribe_en = "🔔 Subscribe";
-    String subscribe_ru = "🔔 Подписка";
-
-    String city_uz = "🏙 Shahar";
-    String city_en = "🏙 City";
-    String city_ru = "🏙 Город";
+    String subscribe_uz = "Kundalik xabar ☀\uFE0F";
+    String subscribe_en = "Daily Update ☀\uFE0F";
+    String subscribe_ru = "Ежедневное сообщение ☀\uFE0F";
 
     String search_uz = "🔍 Qidiruv";
     String search_en = "🔍 Search";
     String search_ru = "🔍 Поиск";
+
+    String changeLangUz = "🌍 Tilni o'zgartirish";
+    String changeLangEn = "🌍 Change language";
+    String changeLangRu = "🌍 Изменить язык";
+
+    String changeLocationUz = "Joylashuvni o‘zgartirish 📍";
+    String changeLocationEn = "Change my location 📍";
+    String changeLocationRu = "Изменить местоположение 📍";
+
+    String backUz = "⬅️ Orqaga";
+    String backEn = "⬅️ Back";
+    String backRu = "⬅️ Назад";
 }

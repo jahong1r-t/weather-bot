@@ -1,6 +1,6 @@
 package uz.weather.db;
 
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import lombok.SneakyThrows;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -18,6 +18,7 @@ public class Datasource {
     public static Map<Long, State> states = new HashMap<>();
     public static Map<Long, User> users = new HashMap<>();
 
+    @SneakyThrows
     public static ReplyKeyboardMarkup keyboard(String[][] buttons) {
         List<KeyboardRow> rows = new ArrayList<>();
 
@@ -35,6 +36,7 @@ public class Datasource {
         return reply;
     }
 
+    @SneakyThrows
     public static ReplyKeyboardMarkup keyboardLocation(Language lang) {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
@@ -52,7 +54,6 @@ public class Datasource {
 
         reply.setKeyboard(keyboard);
         reply.setResizeKeyboard(true);
-
 
         return reply;
     }

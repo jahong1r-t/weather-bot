@@ -15,7 +15,14 @@ import static uz.weather.entity.enums.Language.ENGLISH;
 import static uz.weather.entity.enums.Language.UZBEK;
 
 public interface Message {
-    String choseLangUz = "Salom! \uD83C\uDF1F Ob-havo botiga xush kelibsiz. Ro‘yxatdan o‘tmagan bo‘lsangiz, avval tilni tanlang:";
+    String choseLangUz = "Salom! \uD83C\uDF1F Ob-havo botiga xush kelibsiz.\nO'zingizga kerakli tilni tanlang tilni tanlang:";
+    String errMsgUz = "Salom! \uD83C\uDF1F Ob-havo botiga xush kelibsiz.\nO'zingizga kerakli tilni tanlang tilni tanlang:";
+
+    static String changeLangMsg(Language lang) {
+        return lang == UZBEK ? "O'zingizga kerakli tilni tanlang tilni tanlang:" :
+                lang == ENGLISH ? "Select the language you want:" :
+                        "Выберите нужный вам язык:";
+    }
 
     static String mainMenuMsg(Language lang) {
         return lang == UZBEK ? "Assalomu alaykum. Kerakkli bo'limni tanlng 👇" :
@@ -23,10 +30,16 @@ public interface Message {
                         "Привет! \uD83C\uDF1F Выберите нужный раздел \uD83D\uDC47";
     }
 
+    static String settingsMenuMsg(Language lang) {
+        return lang == UZBEK ? "Sozlamalar" :
+                lang == ENGLISH ? "Settings" :
+                        "Настройки";
+    }
+
     static String authSendLocation(Language lang) {
-        return lang == UZBEK ? "Ob-havo ma’lumotini bilish uchun shahar nomini yozing yoki lokatsiyangizni yuboring! \uD83D\uDCCD" :
-                lang == ENGLISH ? "To get the weather information, enter the city name or send your location! \uD83D\uDCCD" :
-                        "Чтобы узнать погоду, введите название города или отправьте свою локацию! \uD83D\uDCCD";
+        return lang == UZBEK ? "Ob-havo ma’lumotini bilish uchun shahar nomini yozing yoki lokatsiyangizni yuboring!" :
+                lang == ENGLISH ? "To get the weather information, enter the city name or send your location!" :
+                        "Чтобы узнать погоду, введите название города или отправьте свою локацию!";
     }
 
     static String searchMsg(Language lang) {
@@ -35,13 +48,31 @@ public interface Message {
                         "Введите название города, чтобы узнать погоду!! 🔍";
     }
 
+    static String change_lang_success_msg(Language lang) {
+        return lang == UZBEK ? "✅ Til muvaffaqiyatli o'zgartirildi" :
+                lang == ENGLISH ? "✅ Language successfully changed" :
+                        "✅ Язык успешно изменен";
+    }
+
+    static String changeLocationSuccessMsg(Language lang) {
+        return lang == UZBEK ? "Joylashuv muvaffaqiyatli o‘zgartirildi" :
+                lang == ENGLISH ? "Location successfully changed"
+                        : "Местоположение успешно изменено";
+    }
+
     static ReplyKeyboard mainPanel(Language lang) {
         return lang == UZBEK ? keyboard(Util.mainMenuUz) :
                 lang == ENGLISH ? keyboard(Util.mainMenuEn) :
                         keyboard(Util.mainMenuRu);
     }
 
-    static String getDailyMessage(User user) {
+    static ReplyKeyboard settingsPanel(Language lang) {
+        return lang == UZBEK ? keyboard(Util.settingsPanelUz) :
+                lang == ENGLISH ? keyboard(Util.settingsPanelEn) :
+                        keyboard(Util.settingsPanelRu);
+    }
+
+    static DailyWeatherInfo getDailyMessage(User user) {
         Response response;
         Language lang = user.getLanguage();
 
@@ -51,7 +82,9 @@ public interface Message {
             response = ApiService.getDailyInformation(null, null, user.getCity());
         }
 
-        if (response.getCod() == 200) {
+        if (Objects.requireNonNull(response).getCod() == 200) {
+            user.setCityFound(true);
+
             Main main = Objects.requireNonNull(response).getMain();
             Clouds clouds = response.getClouds();
             Wind wind = response.getWind();
@@ -69,7 +102,7 @@ public interface Message {
             String sunrise = new SimpleDateFormat("HH:mm").format(new Date(sunriseTime));
             String sunset = new SimpleDateFormat("HH:mm").format(new Date(sunsetTime));
 
-            return (lang == UZBEK) ? """
+            String message = (lang == UZBEK) ? """
                     🌤️ %s uchun ob-havo 🌤️
                     
                     ☁️ Havo holati: %s
@@ -116,12 +149,18 @@ public interface Message {
                                     🌇 Закат: %s
                                     🌍 Координаты: %s, %s
                                     """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), sunrise, sunset, coord.getLat().toString(), coord.getLon().toString());
+
+            String imagePath = getWeatherImagePath(response);
+            return new DailyWeatherInfo(message, imagePath);
         } else {
-            return lang == UZBEK ? "❌ Kechirasiz, kiritilgan shahar topilmadi. Iltimos, shahar nomini tekshirib qaytadan kiriting yoki lokatsiyangizni yuboring!" :
+            user.setCityFound(false);
+            String errorMessage = lang == UZBEK ? "❌ Kechirasiz, kiritilgan shahar topilmadi. Iltimos, shahar nomini tekshirib qaytadan kiriting yoki lokatsiyangizni yuboring!" :
                     lang == ENGLISH ? "❌ Sorry, the specified city was not found. Please check the city name and try again or send your location!" :
                             "❌ Извините, указанный город не найден. Пожалуйста, проверьте название города и попробуйте снова или отправьте свою локацию!";
+            return new DailyWeatherInfo(errorMessage, "src/main/resources/weather.jpg");
         }
     }
+
 
     static String getWeeklyMessage(User user) {
         WeatherForecast forecast;
@@ -133,7 +172,9 @@ public interface Message {
             forecast = ApiService.getWeeklyInformation(null, null, user.getCity());
         }
 
-        if (forecast != null && "200".equals(forecast.getCod())) {
+        if (Objects.equals(forecast.getCod(),"200")) {
+            user.setCityFound(true);
+
             List<ForecastItem> forecastList = forecast.getList();
             City city = forecast.getCity();
 
@@ -148,6 +189,8 @@ public interface Message {
                             String.format("🌤️ Прогноз погоды на 5 дней для %s 🌤️\n\n", city.getName()));
 
             String lastDate = "";
+
+
             for (ForecastItem item : forecastList) {
                 String currentDate = dateFormat.format(new Date(item.getDt() * 1000));
                 if (!currentDate.equals(lastDate)) {
@@ -210,7 +253,7 @@ public interface Message {
                 }
             }
 
-            long sunriseTime = city.getSunrise() * 1000L; // Casting o‘rniga to‘g‘ridan-to‘g‘ri ko‘paytma
+            long sunriseTime = city.getSunrise() * 1000L;
             long sunsetTime = city.getSunset() * 1000L;
             String sunrise = timeFormat.format(new Date(sunriseTime));
             String sunset = timeFormat.format(new Date(sunsetTime));
@@ -229,6 +272,7 @@ public interface Message {
 
             return message.toString();
         } else {
+            user.setCityFound(false);
             return lang == Language.UZBEK ?
                     "❌ Kechirasiz, kiritilgan shahar topilmadi. Iltimos, shahar nomini tekshirib qaytadan kiriting yoki lokatsiyangizni yuboring!" :
                     lang == Language.ENGLISH ?
@@ -236,5 +280,20 @@ public interface Message {
                             "❌ Извините, указанный город не найден. Пожалуйста, проверьте название города и попробуйте снова или отправьте свою локацию!";
         }
     }
+
+    static String getWeatherImagePath(Response response) {
+        double temp = response.getMain().getTemp();
+        if (temp <= 10) {
+            return "src/main/resources/cold.jpg";
+        } else if (temp <= 25) {
+            return "src/main/resources/warm.jpg";
+        } else {
+            return "src/main/resources/hot.jpg";
+        }
+    }
+
+    record DailyWeatherInfo(String message, String imagePath) {
+    }
 }
+
 

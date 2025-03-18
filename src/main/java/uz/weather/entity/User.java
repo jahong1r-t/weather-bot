@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.Location;
 import uz.weather.entity.enums.Language;
 
+import java.time.ZoneId;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -17,5 +19,8 @@ public class User {
     private String fullName;
     private Location location;
     private String city;
+    private boolean isSubscribed;
+    private boolean isCityFound;
     private Language language;
+    private ZoneId zoneId;
 }

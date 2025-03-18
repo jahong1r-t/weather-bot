@@ -1,10 +1,5 @@
 package uz.weather.util;
 
-import uz.weather.entity.*;
-import uz.weather.entity.enums.Language;
-
-import java.util.List;
-
 import static uz.weather.util.Button.*;
 
 public interface Util {
@@ -26,4 +21,8 @@ public interface Util {
             {search_ru, subscribe_ru},
             {settings_ru}
     };
+
+    String[][] settingsPanelUz = {{changeLangUz, changeLocationUz}, {backUz}};
+    String[][] settingsPanelEn = {{changeLangEn, changeLocationEn}, {backEn}};
+    String[][] settingsPanelRu = {{changeLangRu, changeLocationRu}, {backRu}};
 }

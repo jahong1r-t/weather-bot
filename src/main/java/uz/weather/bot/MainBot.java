@@ -1,6 +1,7 @@
 package uz.weather.bot;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -12,12 +13,15 @@ import uz.weather.util.Bot;
 
 import java.io.File;
 
-
+@Slf4j
 public class MainBot extends TelegramLongPollingBot {
 
+    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        new AuthService().service(update);
+        if (update.hasMessage()) {
+            new AuthService().service(update);
+        }
     }
 
     @SneakyThrows

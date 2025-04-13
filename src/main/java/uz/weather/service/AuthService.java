@@ -38,12 +38,13 @@ public class AuthService extends MainBot {
                                 .userName(from.getUserName() != null ? from.getUserName() : "Unknown")
                                 .fullName(from.getLastName() != null ? from.getFirstName() + " " + from.getLastName() : from.getFirstName())
                                 .language(text.equals(UZ) ? Language.UZBEK : text.equals(EN) ? Language.ENGLISH : Language.RUSSIAN)
+                                .isSubscribed(true)
                                 .build();
                         users.put(chatId, build);
                         sendMessage(chatId, Message.authSendLocation(users.get(chatId).getLanguage()), keyboardLocation(users.get(chatId).getLanguage()));
                         states.put(chatId, State.SEND_LOCATION);
                     }
-                    default -> sendMessage(chatId, Message.errMsgUz , keyboard(Util.languageMenu));
+                    default -> sendMessage(chatId, Message.errMsgUz, keyboard(Util.languageMenu));
                 }
             } else if (currentState == State.SEND_LOCATION) {
                 if (update.getMessage().hasLocation()) {

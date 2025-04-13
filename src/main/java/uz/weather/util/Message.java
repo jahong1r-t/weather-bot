@@ -42,6 +42,19 @@ public interface Message {
                         "Чтобы узнать погоду, введите название города или отправьте свою локацию!";
     }
 
+    static String unSubscribedMsg(Language lang) {
+        return lang == UZBEK ? "Har kunlik ob-havo xabarlari muvaffaqiyatli o‘chirildi. Endi ob-havo xabarlari olmaysiz." :
+                lang == ENGLISH ? "Daily weather updates have been successfully disabled. You will no longer receive weather notifications." :
+                        "Ежедневные обновления погоды успешно отключены. Вы больше не будете получать уведомления о погоде.";
+    }
+
+    static String subscribedMsg(Language lang) {
+        return lang == UZBEK ? "Har kunlik ob-havo xabarlari muvaffaqiyatli yoqildi! Endi har kuni soat 07:00 da ob-havo ma'lumotlarini olasiz." :
+                lang == ENGLISH ? "Daily weather updates have been successfully enabled! You will now receive weather information every day at 07:00." :
+                        "Ежедневные обновления погоды успешно включены! Теперь вы будете получать информацию о погоде каждый день в 07:00.";
+    }
+
+
     static String searchMsg(Language lang) {
         return lang == UZBEK ? "Ob-havo ma’lumotini bilmoqchi bo'lgan shahar nomini kiriting! 🔍" :
                 lang == ENGLISH ? "Enter the city name to get the weather information! 🔍" :
@@ -91,16 +104,27 @@ public interface Message {
             Sys sys = response.getSys();
             Coord coord = response.getCoord();
             List<WeatherItem> weather = response.getWeather();
+            Rain rain = response.getRain();
 
             String weatherDesc = weather != null && !weather.isEmpty() ?
-                    weather.get(0).getDescription() : (lang == UZBEK ?
-                    "Ma'lumot yo‘q" : (lang == ENGLISH ?
-                    "No data available" : "Нет данных"));
+                    weather.get(0).getDescription() : (lang == UZBEK ? "Ma'lumot yo‘q" : (lang == ENGLISH ? "No data available" : "Нет данных"));
 
             long sunriseTime = (long) sys.getSunrise() * 1000;
             long sunsetTime = (long) sys.getSunset() * 1000;
             String sunrise = new SimpleDateFormat("HH:mm").format(new Date(sunriseTime));
             String sunset = new SimpleDateFormat("HH:mm").format(new Date(sunsetTime));
+
+            String rainInfo = "";
+            if (rain != null) {
+                double rainLast3Hours = rain.getThreeHour();
+                if (rainLast3Hours > 0) {
+                    rainInfo = (lang == UZBEK) ?
+                            "☔ Yomg‘ir yog‘moqda. Oxirgi 3 soatda: " + rainLast3Hours + " mm" :
+                            (lang == ENGLISH) ?
+                                    "☔ It's raining. Last 3 hours: " + rainLast3Hours + " mm" :
+                                    "☔ Идет дождь. За последние 3 часа: " + rainLast3Hours + " мм";
+                }
+            }
 
             String message = (lang == UZBEK) ? """
                     🌤️ %s uchun ob-havo 🌤️
@@ -112,11 +136,12 @@ public interface Message {
                     🌫️ Ko‘rish masofasi: %d m
                     💨 Shamol: %s m/s, %d°
                     ☁️ Bulut qoplami: %d%%
+                    %s
                     
                     🌅 Quyosh chiqishi: %s
                     🌇 Quyosh botishi: %s
                     🌍 Koordinatalar: %s, %s
-                    """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), sunrise, sunset, coord.getLat().toString(), coord.getLon().toString()) :
+                    """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), rainInfo, sunrise, sunset, coord.getLat().toString(), coord.getLon().toString()) :
 
                     (lang == ENGLISH) ? """
                             🌤️ Weather in %s 🌤️
@@ -128,11 +153,12 @@ public interface Message {
                             🌫️ Visibility: %d m
                             💨 Wind: %s m/s, %d°
                             ☁️ Cloud coverage: %d%%
+                            %s
                             
                             🌅 Sunrise: %s
                             🌇 Sunset: %s
                             🌍 Coordinates: %s, %s
-                            """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), sunrise, sunset, coord.getLat().toString(), coord.getLon().toString()) :
+                            """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), rainInfo, sunrise, sunset, coord.getLat().toString(), coord.getLon().toString()) :
 
                             """
                                     🌤️ Погода в %s 🌤️
@@ -144,11 +170,12 @@ public interface Message {
                                     🌫️ Видимость: %d м
                                     💨 Ветер: %s м/с, %d°
                                     ☁️ Облачность: %d%%
+                                    %s
                                     
                                     🌅 Восход: %s
                                     🌇 Закат: %s
                                     🌍 Координаты: %s, %s
-                                    """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), sunrise, sunset, coord.getLat().toString(), coord.getLon().toString());
+                                    """.formatted(response.getName(), weatherDesc, main.getTempMin().toString(), main.getHumidity(), main.getPressure(), response.getVisibility(), wind.getSpeed().toString(), wind.getDeg(), clouds.getAll(), rainInfo, sunrise, sunset, coord.getLat().toString(), coord.getLon().toString());
 
             String imagePath = getWeatherImagePath(response);
             return new DailyWeatherInfo(message, imagePath);
@@ -172,7 +199,7 @@ public interface Message {
             forecast = ApiService.getWeeklyInformation(null, null, user.getCity());
         }
 
-        if (Objects.equals(forecast.getCod(),"200")) {
+        if (Objects.equals(forecast.getCod(), "200")) {
             user.setCityFound(true);
 
             List<ForecastItem> forecastList = forecast.getList();

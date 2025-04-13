@@ -60,9 +60,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <finalName>weather-bot</finalName> <!-- Output JAR nomini aniq belgilaymiz -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>uz.weather.bot.Main</mainClass>
+                                    <mainClass>uz.weather.bot.Main</mainClass> <!-- Main klassingiz -->
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -71,5 +73,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

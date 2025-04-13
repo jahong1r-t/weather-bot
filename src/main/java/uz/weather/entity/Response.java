@@ -47,4 +47,7 @@ public class Response {
 
     @SerializedName("wind")
     private Wind wind;
+
+    @SerializedName("rain")
+    private Rain rain;
 }

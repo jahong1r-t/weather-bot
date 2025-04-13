@@ -41,6 +41,16 @@ public class UserService extends MainBot {
                         states.put(chatId, State.SEND_LOCATION);
                     }
                 }
+                case subscribe_uz, subscribe_en, subscribe_ru -> {
+                    if (user.isSubscribed()) {
+                        sendMessage(chatId, unSubscribedMsg(lang));
+                        user.setSubscribed(false);
+                    } else {
+                        sendMessage(chatId, subscribedMsg(lang));
+                        user.setSubscribed(true);
+                    }
+                }
+
                 case week_uz, week_en, week_ru -> {
                     if (user.isCityFound()) {
                         sendMessage(chatId, getWeeklyMessage(user), "src/main/resources/weather.jpg");
